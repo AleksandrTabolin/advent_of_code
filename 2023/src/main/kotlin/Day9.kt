@@ -4,7 +4,7 @@ object Day9 {
         return input
             .map(::parseInput)
             .map(::collectDiffs)
-            .map { diffs -> diffs.reversed().fold(0) { acc, diff -> acc + diff.last() } }
+            .map { diffs -> diffs.foldRight(0) { diff, acc -> acc + diff.last() } }
             .sum()
     }
 
@@ -12,7 +12,7 @@ object Day9 {
         return input
             .map(::parseInput)
             .map(::collectDiffs)
-            .map { diffs -> diffs.reversed().fold(0) { acc, diff -> (diff.first() - acc) } }
+            .map { diffs -> diffs.foldRight(0) { diff, acc -> (diff.first() - acc) } }
             .sum()
     }
 

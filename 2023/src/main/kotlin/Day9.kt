@@ -18,17 +18,13 @@ object Day9 {
 
     private fun List<Int>.collectDiffs(): List<List<Int>> {
         return mutableListOf(this).apply {
-            while (last().any { it != 0 }) {
-                add(last().diffByTwo().toList())
-            }
+            while (last().any { it != 0 }) add(last().diff().toList())
         }
     }
 
-    private fun List<Int>.diffByTwo(): Sequence<Int> = sequence {
-        var prev = first()
-        for (i in 1 until size) {
-            yield(get(i) - prev)
-            prev = get(i)
+    private fun List<Int>.diff(): Sequence<Int> = sequence {
+        for (i in 0 until size - 1) {
+            yield(get(i + 1) - get(i))
         }
     }
 }

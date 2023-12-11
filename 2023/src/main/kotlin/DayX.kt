@@ -4,7 +4,7 @@ object DayX {
         return -1
     }
 
-    fun solvePart2(input: Sequence<String>): Long {
+    fun solvePart2(input: Sequence<String>): Int {
        return -1
     }
 }

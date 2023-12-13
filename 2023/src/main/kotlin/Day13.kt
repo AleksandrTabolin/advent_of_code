@@ -2,33 +2,13 @@ object Day13 {
 
     fun solvePart1(input: Sequence<String>): Int {
         return parseInput(input).sumOf { matrix ->
-            val mirror = checkVertical(matrix) ?: checkHorizontal(matrix)
-
-            if (mirror != null) {
-                if (mirror.type == 'V') {
-                    mirror.center.first + 1
-                } else {
-                    (mirror.center.first + 1) * 100
-                }
-            } else {
-                0
-            }
+            checkVertical(matrix) ?: checkHorizontal(matrix) ?: 0
         }
     }
 
     fun solvePart2(input: Sequence<String>): Int {
         return parseInput(input).sumOf { matrix ->
-            val mirror = checkVertical2(matrix) ?: checkHorizontal2(matrix)
-
-            if (mirror != null) {
-                if (mirror.type == 'V') {
-                    mirror.center.first + 1
-                } else {
-                    (mirror.center.first + 1) * 100
-                }
-            } else {
-                0
-            }
+            checkVertical2(matrix) ?: checkHorizontal2(matrix) ?: 0
         }
     }
 
@@ -50,7 +30,7 @@ object Day13 {
         }
     }
 
-    private fun checkVertical(matrix: List<String>): Mirror? {
+    private fun checkVertical(matrix: List<String>): Int? {
         for (j in matrix.first().indices) {
             if (matrix.areColumnsEquals(j, j + 1)) {
                 var left = j
@@ -61,14 +41,14 @@ object Day13 {
                     right += 1
                 }
                 if (left == 0 || right == matrix.first().lastIndex) {
-                    return Mirror('V', center, left, right)
+                    return center.first + 1
                 }
             }
         }
         return null
     }
 
-    private fun checkHorizontal(matrix: List<String>): Mirror? {
+    private fun checkHorizontal(matrix: List<String>): Int? {
         for (j in matrix.indices) {
             if (matrix.areRowsEquals(j, j + 1)) {
                 var left = j
@@ -80,7 +60,7 @@ object Day13 {
                 }
 
                 if (left == 0 || right == matrix.lastIndex) {
-                    return Mirror('H', center, left, right)
+                    return (center.first + 1) * 100
                 }
             }
         }
@@ -101,7 +81,7 @@ object Day13 {
         return true
     }
 
-    private fun checkVertical2(matrix: List<String>): Mirror? {
+    private fun checkVertical2(matrix: List<String>): Int? {
         for (j in matrix.first().indices) {
             var diff = matrix.getColumnsDiffs(j, j + 1)
 
@@ -118,14 +98,14 @@ object Day13 {
                     nextDiff = matrix.getColumnsDiffs(left - 1, right + 1)
                 }
                 if (diff == 1 && (left == 0 || right == matrix.first().lastIndex)) {
-                    return Mirror('V', center, left, right)
+                    return center.first + 1
                 }
             }
         }
         return null
     }
 
-    private fun checkHorizontal2(matrix: List<String>): Mirror? {
+    private fun checkHorizontal2(matrix: List<String>): Int? {
         for (j in matrix.indices) {
             var diff = matrix.getRowsDiffs(j, j + 1)
 
@@ -142,7 +122,7 @@ object Day13 {
                     nextDiff = matrix.getRowsDiffs(left - 1, right + 1)
                 }
                 if (diff == 1 && (left == 0 || right == matrix.lastIndex)) {
-                    return Mirror('H', center, left, right)
+                    return (center.first + 1) * 100
                 }
             }
         }
@@ -171,14 +151,5 @@ object Day13 {
         }
         return diff
     }
-
-
-    private data class Mirror(
-        val type: Char,
-        val center: Pair<Int, Int>,
-        val left: Int,
-        val right: Int
-    )
-
 
 }

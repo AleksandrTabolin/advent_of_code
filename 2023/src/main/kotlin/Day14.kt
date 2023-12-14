@@ -40,6 +40,8 @@ object Day14 {
             if (get(i) == list[j]) {
                 j += 1
                 if (j == list.size) return i - list.size + 1
+            } else {
+                j = 0
             }
         }
         return -1

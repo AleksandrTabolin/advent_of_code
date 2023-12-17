@@ -3,7 +3,7 @@ import org.junit.jupiter.api.Test
 
 class Day17Test {
 
-    private val input = """
+    private val input1 = """
         2413432311323
         3215453535623
         3255245654254
@@ -19,9 +19,17 @@ class Day17Test {
         4322674655533
     """.trimIndent()
 
+    private val input2 = """
+        111111111111
+        999999999991
+        999999999991
+        999999999991
+        999999999991
+    """.trimIndent()
+
     @Test
     fun test1p1() {
-        val input = input.splitToSequence("\n")
+        val input = input1.splitToSequence("\n")
         Assertions.assertEquals(102, Day17.solvePart1(input))
     }
 
@@ -33,13 +41,17 @@ class Day17Test {
 
     @Test
     fun test1p2() {
-        val input = input.splitToSequence("\n")
-        Assertions.assertEquals(-1, Day17.solvePart2(input))
+        Assertions.assertEquals(94, Day17.solvePart2(input1.splitToSequence("\n")))
     }
 
     @Test
     fun test2p2() {
-        val input = FileHelper.readByLines("day17")
-        Assertions.assertEquals(-1, Day17.solvePart2(input))
+        Assertions.assertEquals(71, Day17.solvePart2(input2.splitToSequence("\n")))
+    }
+
+    @Test
+    fun test3p2() {
+        //1040, 1066, 1120, 1154 too high
+        Assertions.assertEquals(-1, Day17.solvePart2(FileHelper.readByLines("day17")))
     }
 }

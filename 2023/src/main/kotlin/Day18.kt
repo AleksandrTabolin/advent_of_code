@@ -70,10 +70,9 @@ object Day18 {
         prevRowIntervals ?: return true
 
         val counter = prevRowIntervals.count {
-            val result =
-                (interval.leftX == it.leftX || interval.leftX == it.rightX || interval.rightX == it.leftX || interval.rightX == it.rightX) && it.downY == row - 1
-            result
+            (interval.leftX == it.leftX || interval.leftX == it.rightX || interval.rightX == it.leftX || interval.rightX == it.rightX) && it.downY == row - 1
         }
+
         return if (interval.downY > row) {
             counter == 0
         } else if (interval.topY < row) {

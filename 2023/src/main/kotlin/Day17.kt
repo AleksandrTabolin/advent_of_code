@@ -19,13 +19,7 @@ object Day17 {
 
         val startPosition = Position(0, 0)
 
-        Step(
-            startPosition,
-            Direction.RIGHT,
-            matrix.getScore(startPosition),
-            oneDirectionSteps = 1
-        ).also(::tryAddToQueue)
-        Step(startPosition, Direction.DOWN, matrix.getScore(startPosition), oneDirectionSteps = 1).also(::tryAddToQueue)
+        Step(startPosition, Direction.RIGHT, matrix.getScore(startPosition), oneDirectionSteps = 0).also(::tryAddToQueue)
 
         var result = Int.MAX_VALUE
 
@@ -58,7 +52,7 @@ object Day17 {
 
         val startPosition = Position(0, 0)
 
-        Step(startPosition, Direction.RIGHT, matrix.getScore(startPosition), oneDirectionSteps = 1).also(::tryAddToQueue)
+        Step(startPosition, Direction.RIGHT, matrix.getScore(startPosition), oneDirectionSteps = 0).also(::tryAddToQueue)
 
         var result = Int.MAX_VALUE
 

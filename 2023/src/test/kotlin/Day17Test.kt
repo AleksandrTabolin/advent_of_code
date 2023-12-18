@@ -51,7 +51,6 @@ class Day17Test {
 
     @Test
     fun test3p2() {
-        //1040, 1066, 1120, 1154 too high
-        Assertions.assertEquals(-1, Day17.solvePart2(FileHelper.readByLines("day17")))
+        Assertions.assertEquals(1063, Day17.solvePart2(FileHelper.readByLines("day17")))
     }
 }

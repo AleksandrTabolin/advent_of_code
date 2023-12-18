@@ -1,12 +1,14 @@
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 object Day18 {
 
     fun solvePart1(input: Sequence<String>): Long {
         return input.map {
             val (direction, length, _) = it.split(" ")
-            direction to length.toLong().also { println(it) }
-        }.collectPositions().createMatrix().count()
+            direction to length.toLong()
+        }.collectIntervals().count()
     }
 
     fun solvePart2(input: Sequence<String>): Long {
@@ -23,110 +25,214 @@ object Day18 {
             val length = clearedColor.dropLast(1).toLong(16)
 
             direction to length
-        }.collectPositions().createMatrix().count()
+        }.collectIntervals().count()
     }
 
-    private fun List<List<Char>>.count(): Long {
+    private fun Field.count(): Long {
         var resultCount = 0L
-        for (row in this.indices) {
+        var prevRowIntervals: List<СontinuousInterval>? = null
+
+        for (row in top..down) {
             var rowCount = 0L
-            val line = get(row)
-            val groups = line.splitToGroups().toList()
+            val rowIntervals = getRowIntervals(row)
 
-            for (i in groups.indices) {
-                rowCount += groups[i].length()
+            for (x in rowIntervals.indices) {
+                rowCount += rowIntervals[x].horizontalLength
 
-                if (i == groups.lastIndex) continue
+                if (x == rowIntervals.lastIndex) continue
 
-                var count = 0
-                for (j in i + 1..groups.lastIndex) {
-                    count += if (isPillarShaped(row, groups[j])) 2 else 1
+                var count = 0L
+                for (j in x + 1..rowIntervals.lastIndex) {
+                    count += if (isPillarShaped(row, rowIntervals[j], prevRowIntervals)) 2L else 1L
                 }
 
-                if (count % 2 == 1) {
-                    rowCount += (groups[i].second + 1 to groups[i + 1].first - 1).length()
+                if (count % 2 == 1L) {
+                    rowCount += (rowIntervals[x].rightX + 1 to rowIntervals[x + 1].leftX - 1).length()
                 }
             }
 
+            prevRowIntervals = rowIntervals
             resultCount += rowCount
         }
 
         return resultCount
     }
 
-    private fun List<List<Char>>.isPillarShaped(row: Int, interval: Pair<Int, Int>): Boolean {
-        if (interval.length() == 1) return false
-        if (row == 0 || row == lastIndex) return true
-        val (start, end) = interval
-        return get(row + 1)[start] == get(row + 1)[end] && get(row - 1)[start] == get(row - 1)[end]
-    }
+    private fun Field.isPillarShaped(
+        row: Long,
+        interval: СontinuousInterval,
+        prevRowIntervals: List<СontinuousInterval>?
+    ): Boolean {
+        if (interval.horizontalLength > 1L && (row == top || row == down)) return true
 
+        if (interval.horizontalLength == 1L) return false
 
-    private fun List<Char>.splitToGroups(): Sequence<Pair<Int, Int>> = sequence {
-        val line = this@splitToGroups
-        var start = -1
-        var end = -1
+        prevRowIntervals ?: return true
 
-        for (i in line.indices) {
-            if (start == -1 && line[i] == '#') {
-                start = i
-            } else if (start != -1 && line[i] == '.' && line[i - 1] == '#') {
-                end = i - 1
-            } else if (start != -1 && line[i] == '#' && (line[i - 1] == '.' || i == line.lastIndex)) {
-                end = i
-            }
-
-            if (start != -1 && end != -1) {
-                yield(start to end)
-                start = -1
-                end = -1
-            }
+        val counter = prevRowIntervals.count {
+            val result =
+                (interval.leftX == it.leftX || interval.leftX == it.rightX || interval.rightX == it.leftX || interval.rightX == it.rightX) && it.downY == row - 1
+            result
         }
-
-        if (start != -1 && start == line.lastIndex) {
-            yield(start to start)
+        return if (interval.downY > row) {
+            counter == 0
+        } else if (interval.topY < row) {
+            counter == 1
+        } else {
+            counter == 2 || counter == 0
         }
     }
 
-    private fun Pair<Int, Int>.length() = second - first + 1
-
-    private fun List<Position>.createMatrix(): List<List<Char>> {
-        val sizeX = maxOf { it.x } + 1
-        val sizeY = maxOf { it.y } + 1
-
-        val matrix = buildList { repeat(sizeY) { add(buildList { repeat(sizeX) { add('.') } }.toMutableList()) } }
-
-        forEach { matrix[it.y][it.x] = '#' }
-
-        return matrix
-    }
-
-    private fun Sequence<Pair<String, Long>>.collectPositions(): List<Position> {
-        val positions: List<Position> = fold(mutableListOf()) { acc, line ->
+    private fun Sequence<Pair<String, Long>>.collectIntervals(): Field {
+        var intervals: List<Interval> = fold(mutableListOf()) { acc, line ->
             val (direction, length) = line
+            val fixedLength = length - 1
 
-            var prevPosition = acc.lastOrNull() ?: Position(0, 0).also(acc::add)
+            var firstPosition = acc.lastOrNull()?.last ?: Position(0, 0)
+            var lastPosition = firstPosition
+            when (direction) {
+                "R" -> {
+                    firstPosition = firstPosition.copy(x = firstPosition.x + 1)
+                    lastPosition = firstPosition.copy(x = firstPosition.x + fixedLength)
+                }
 
-            repeat(length.toInt()) {
-                prevPosition = when (direction) {
-                    "R" -> prevPosition.copy(x = prevPosition.x + 1).also(acc::add)
-                    "U" -> prevPosition.copy(y = prevPosition.y - 1).also(acc::add)
-                    "L" -> prevPosition.copy(x = prevPosition.x - 1).also(acc::add)
-                    "D" -> prevPosition.copy(y = prevPosition.y + 1).also(acc::add)
-                    else -> throw IllegalStateException("unknown direction: '$direction'")
+                "U" -> {
+                    firstPosition = firstPosition.copy(y = firstPosition.y - 1)
+                    lastPosition = firstPosition.copy(y = firstPosition.y - fixedLength)
+                }
+
+                "L" -> {
+                    firstPosition = firstPosition.copy(x = firstPosition.x - 1)
+                    lastPosition = firstPosition.copy(x = firstPosition.x - fixedLength)
+                }
+
+                "D" -> {
+                    firstPosition = firstPosition.copy(y = firstPosition.y + 1)
+                    lastPosition = firstPosition.copy(y = firstPosition.y + fixedLength)
                 }
             }
+            acc.add(Interval(firstPosition, lastPosition))
             acc
         }
-        val offsetX = abs(kotlin.math.min(0, positions.minOf { it.x }))
-        val offsetY = abs(kotlin.math.min(0, positions.minOf { it.y }))
-        return positions.map { position ->
-            Position(x = position.x + offsetX, y = position.y + offsetY)
+
+        var minX = Long.MAX_VALUE
+        var minY = Long.MAX_VALUE
+        var maxX = Long.MIN_VALUE
+        var maxY = Long.MIN_VALUE
+
+        intervals.forEach {
+            minX = min(minX, min(it.first.x, it.last.x))
+            minY = min(minY, min(it.first.y, it.last.y))
+            maxX = max(maxX, max(it.first.x, it.last.x))
+            maxY = max(maxY, max(it.first.y, it.last.y))
         }
+
+        val diffX = abs(minX)
+        val diffY = abs(minY)
+
+        intervals = intervals.map { interval ->
+            Interval(
+                first = Position(interval.first.x + diffX, interval.first.y + diffY),
+                last = Position(interval.last.x + diffX, interval.last.y + diffY),
+            )
+        }.sortedBy { it.leftX }
+
+        return Field(
+            left = 0,
+            top = 0,
+            right = maxX + diffX,
+            down = maxY + diffY,
+            intervals = intervals
+        )
+    }
+
+    private data class Field(
+        val left: Long,
+        val top: Long,
+        val right: Long,
+        val down: Long,
+        val intervals: List<Interval>
+    )
+
+    private fun Field.getRowIntervals(row: Long): List<СontinuousInterval> {
+        val rowIntervals = intervals.filter { row >= it.topY && row <= it.downY }
+        val result = mutableListOf<СontinuousInterval>()
+
+        var prevInterval: Interval? = rowIntervals.firstOrNull()
+
+        for (i in 1..rowIntervals.lastIndex) {
+            val interval = rowIntervals[i]
+
+            if (prevInterval != null && prevInterval.rightX + 1 == interval.leftX) {
+                result.add(СontinuousInterval(prevInterval, interval))
+                prevInterval = null
+            } else if (prevInterval != null) {
+                result.add(СontinuousInterval(prevInterval))
+                prevInterval = interval
+            } else {
+                prevInterval = interval
+            }
+        }
+
+        if (prevInterval != null) {
+            result.add(СontinuousInterval(prevInterval))
+        }
+        return result
+    }
+
+    private data class СontinuousInterval(
+        val first: Interval,
+        val last: Interval? = null
+    ) {
+        val leftX: Long by lazy {
+            if (last == null) {
+                min(first.first.x, first.last.x)
+            } else {
+                min(min(first.first.x, first.last.x), min(last.first.x, last.last.x))
+            }
+        }
+
+        val rightX: Long by lazy {
+            if (last == null) {
+                max(first.first.x, first.last.x)
+            } else {
+                max(max(first.first.x, first.last.x), max(last.first.x, last.last.x))
+            }
+        }
+
+        val topY: Long by lazy {
+            if (last == null) {
+                min(first.first.y, first.last.y)
+            } else {
+                min(min(first.first.y, first.last.y), min(last.first.y, last.last.y))
+            }
+        }
+
+        val downY: Long by lazy {
+            if (last == null) {
+                max(first.first.y, first.last.y)
+            } else {
+                max(max(first.first.y, first.last.y), max(last.first.y, last.last.y))
+            }
+        }
+
+        val horizontalLength: Long by lazy { rightX - leftX + 1 }
+    }
+
+    private data class Interval(
+        val first: Position,
+        val last: Position,
+    ) {
+        val topY = min(first.y, last.y)
+        val downY = max(first.y, last.y)
+        val leftX = min(first.x, last.x)
+        val rightX = max(first.x, last.x)
     }
 
     private data class Position(
-        val x: Int,
-        val y: Int,
+        val x: Long,
+        val y: Long,
     )
+
+    private fun Pair<Long, Long>.length() = second - first + 1
 }

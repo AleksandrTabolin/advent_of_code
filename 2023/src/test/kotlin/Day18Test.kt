@@ -41,6 +41,6 @@ class Day18Test {
     @Test
     fun test2p2() {
         val input = FileHelper.readByLines("day18")
-        Assertions.assertEquals(-1, Day18.solvePart2(input))
+        Assertions.assertEquals(63806916814808L, Day18.solvePart2(input))
     }
 }

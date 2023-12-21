@@ -3,7 +3,7 @@ import org.junit.jupiter.api.Test
 import utils.DayX
 import utils.FileHelper
 
-class DayXTest {
+class Day21Test {
 
     private val input = """
     """.trimIndent()

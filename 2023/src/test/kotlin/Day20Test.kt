@@ -39,13 +39,8 @@ class Day20Test {
 
     @Test
     fun test1p2() {
-        val input = input1.splitToSequence("\n")
-        Assertions.assertEquals(-1, Day20.solvePart2(input))
+        val input = FileHelper.readByLines("day20")
+        Assertions.assertEquals(237878264003759, Day20.solvePart2(input))
     }
 
-    @Test
-    fun test2p2() {
-        val input = FileHelper.readByLines("day20")
-        Assertions.assertEquals(-1, Day20.solvePart2(input))
-    }
 }

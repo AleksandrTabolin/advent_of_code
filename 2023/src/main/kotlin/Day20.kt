@@ -1,3 +1,4 @@
+import utils.MathUtil
 import java.util.*
 
 object Day20 {
@@ -7,20 +8,46 @@ object Day20 {
         val counter = SignalCounter()
 
         repeat(1000) {
-            modules.startCycle(counter, "broadcaster")
+            modules.startCycle(counter)
         }
 
         return counter.lowCounter * counter.highCounter
     }
 
     fun solvePart2(input: Sequence<String>): Long {
-        return -1
+        val modules = input.parseInput()
+
+        var counter = 0L
+        val cycles = mutableMapOf<String, Long>()
+
+        val module = modules.values.find { it.outputs.contains("rx") } as Module.Conjunction
+
+        while (true) {
+            counter += 1
+            modules.startCycle(
+                afterSignal = { signal ->
+                    if (signal.to == module.name ) {
+                        module.state.entries.forEach {(key, value) ->
+                            if (value && key !in cycles) {
+                                cycles[key] = counter
+                            }
+                        }
+                    }
+                }
+            )
+            if (cycles.size == module.state.size) break
+        }
+        return MathUtil.findLCM(cycles.values.toList())
     }
 
-    private fun Map<String, Module>.startCycle(counter: SignalCounter, startModule: String) {
+    private fun Map<String, Module>.startCycle(
+        counter: SignalCounter? = null,
+        afterSignal: (signal: Signal) -> Unit = {}
+
+    ) {
         val queue = LinkedList<Signal>().apply {
-            add(Signal(from = "Button", to = startModule))
-            counter.count(false)
+            add(Signal(from = "Button", to = "broadcaster"))
+            counter?.count(false)
         }
 
         while (queue.isNotEmpty()) {
@@ -34,6 +61,7 @@ object Day20 {
                     module.state[signal.from] = signal.value
                     !module.state.values.all { it }
                 }
+
                 is Module.FlipFlop -> {
                     if (!signal.value) {
                         module.state = !module.state
@@ -46,8 +74,10 @@ object Day20 {
 
             if (signalValue == null) continue
 
+            afterSignal.invoke(signal)
+
             module.outputs.forEach { nextModule ->
-                counter.count(signalValue)
+                counter?.count(signalValue)
                 queue.addLast(Signal(module.name, nextModule, signalValue))
             }
         }

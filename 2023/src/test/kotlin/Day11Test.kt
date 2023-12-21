@@ -1,6 +1,5 @@
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import utils.FileHelper
 
 class Day11Test {
 

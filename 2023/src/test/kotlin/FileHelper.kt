@@ -1,5 +1,3 @@
-package utils
-
 object FileHelper {
     fun readByLines(fileName: String): Sequence<String> {
         return this::class.java.getResourceAsStream(fileName).bufferedReader().lineSequence()

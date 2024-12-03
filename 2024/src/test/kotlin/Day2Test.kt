@@ -1,5 +1,6 @@
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import kotlin.system.measureTimeMillis
 
 class Day2Test {
 

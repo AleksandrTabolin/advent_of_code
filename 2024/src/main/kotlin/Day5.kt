@@ -9,7 +9,11 @@ object Day5 {
 
     fun solvePart2(input: Sequence<String>): Int {
         val (rules, seq) = input.parseInput()
-        return seq.filter { !it.isCorrect(rules) }.map { it.reorder(rules) }.sumOf { it[it.size / 2] }
+        return seq.filter { !it.isCorrect(rules) }.map { it.reorder2(rules) }.sumOf { it[it.size / 2] }
+    }
+
+    private fun List<Int>.reorder2(rules: Map<Int, Set<Int>>): List<Int> {
+        return sortedWith { l, r ->  if (l in rules.getOrDefault(r, emptySet())) -1 else 1 }
     }
 
     private fun List<Int>.reorder(rules: Map<Int, Set<Int>>): List<Int> {
@@ -47,22 +51,19 @@ object Day5 {
     }
 
     private fun Sequence<String>.parseInput(): Pair<Map<Int, Set<Int>>, List<List<Int>>> {
-        val rules = mutableMapOf<Int, MutableSet<Int>>()
-        val seq = mutableListOf<List<Int>>()
-
         var isFirstPart = true
-
-        forEach { line ->
-            if (line.isBlank()) {
-                isFirstPart = false
-            } else if (isFirstPart) {
-                line.split('|').let { (key, value) ->
-                    rules.getOrPut(key.toInt()) { mutableSetOf() }.add(value.toInt())
+        return fold(mutableMapOf<Int, MutableSet<Int>>() to mutableListOf<List<Int>>()) { acc, line ->
+            acc.apply {
+                if (line.isBlank()) {
+                    isFirstPart = false
+                } else if (isFirstPart) {
+                    line.split('|').let { (key, value) ->
+                        first.getOrPut(key.toInt()) { mutableSetOf() }.add(value.toInt())
+                    }
+                } else {
+                    second.add(line.split(',').map { it.toInt() })
                 }
-            } else {
-                seq.add(line.split(',').map { it.toInt() })
             }
         }
-        return rules to seq
     }
 }

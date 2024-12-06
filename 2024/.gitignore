@@ -54,3 +54,5 @@ captures/
 
 # App Bundle
 *.aab
+
+src/test/resources/

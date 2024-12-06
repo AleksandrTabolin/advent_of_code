@@ -7,7 +7,7 @@ object Day6 {
     fun solvePart2(input: Sequence<String>): Int {
         val board = input.parseInput()
         val start = board.findGuard()
-        return board.collectPaths().sumOf { (i, j) -> board.hasLoopIfWall(i, j, start) }
+        return board.collectPaths().count { (i, j) -> board.hasLoopIfWall(i, j, start) }
     }
 
     private fun List<CharArray>.collectPaths(): Set<Pair<Int, Int>> {
@@ -26,11 +26,11 @@ object Day6 {
         return result
     }
 
-    private fun List<CharArray>.hasLoopIfWall(i: Int, j: Int, start: GuardPosition): Int {
-        var result = 0
+    private fun List<CharArray>.hasLoopIfWall(i: Int, j: Int, start: GuardPosition): Boolean {
+        var result = false
         if (get(i)[j] == '.') {
             get(i)[j] = '#'
-            if (checkLoop(start)) result = 1
+            if (checkLoop(start)) result = true
             get(i)[j] = '.'
         }
         return result

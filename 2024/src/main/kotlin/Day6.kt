@@ -7,7 +7,8 @@ object Day6 {
     fun solvePart2(input: Sequence<String>): Int {
         val board = input.parseInput()
         val start = board.findGuard()
-        return board.collectPaths().count { (i, j) -> board.hasLoopIfWall(i, j, start) }
+        val visited = mutableSetOf<GuardPosition>()
+        return board.collectPaths().count { (i, j) -> board.hasLoopIfWall(i, j, start, visited) }
     }
 
     private fun List<CharArray>.collectPaths(): Set<Pair<Int, Int>> {
@@ -26,19 +27,24 @@ object Day6 {
         return result
     }
 
-    private fun List<CharArray>.hasLoopIfWall(i: Int, j: Int, start: GuardPosition): Boolean {
+    private fun List<CharArray>.hasLoopIfWall(
+        i: Int,
+        j: Int,
+        start: GuardPosition,
+        visited: MutableSet<GuardPosition>
+    ): Boolean {
         var result = false
         if (get(i)[j] == '.') {
             get(i)[j] = '#'
-            if (checkLoop(start)) result = true
+            result = checkLoop(start, visited)
             get(i)[j] = '.'
         }
         return result
     }
 
-    private fun List<CharArray>.checkLoop(start: GuardPosition): Boolean {
+    private fun List<CharArray>.checkLoop(start: GuardPosition, visited: MutableSet<GuardPosition>): Boolean {
         var guard = start
-        val visited = mutableSetOf<GuardPosition>()
+        visited.clear()
         while (isIndexInBound(guard.i, guard.j)) {
             if (guard in visited) return true
             guard = if (getNextIfExists(guard) == '#') {
@@ -58,7 +64,13 @@ object Day6 {
     private fun List<CharArray>.findGuard(): GuardPosition {
         for (i in indices) {
             for (j in get(i).indices) {
-                val direction = Direction.entries.find { it.char1 == get(i)[j] }
+                val direction = when (get(i)[j]) {
+                    '^' -> Direction.UP
+                    '>' -> Direction.RIGHT
+                    'v' -> Direction.DOWN
+                    '<' -> Direction.LEFT
+                    else -> null
+                }
                 if (direction != null) return GuardPosition(i, j, direction)
             }
         }
@@ -83,11 +95,8 @@ object Day6 {
 
     private fun GuardPosition.turnRight() = GuardPosition(i, j, direction.turnRight())
 
-    private enum class Direction(val char1: Char, val dx: Int, val dy: Int) {
-        UP('^', 0, -1),
-        RIGHT('>', 1, 0),
-        DOWN('v', 0, 1),
-        LEFT('<', -1, 0);
+    private enum class Direction(val dx: Int, val dy: Int) {
+        UP(0, -1), RIGHT(1, 0), DOWN(0, 1), LEFT(-1, 0);
 
         fun turnRight(): Direction {
             return when (this) {

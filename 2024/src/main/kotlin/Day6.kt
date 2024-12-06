@@ -7,7 +7,7 @@ object Day6 {
     fun solvePart2(input: Sequence<String>): Int {
         val board = input.parseInput()
         val start = board.findGuard()
-        return board.collectPaths().sumOf { (i, j) -> board.hasLoop(i, j, start) }
+        return board.collectPaths().sumOf { (i, j) -> board.hasLoopIfWall(i, j, start) }
     }
 
     private fun List<CharArray>.collectPaths(): Set<Pair<Int, Int>> {
@@ -26,7 +26,7 @@ object Day6 {
         return result
     }
 
-    private fun List<CharArray>.hasLoop(i: Int, j: Int, start: GuardPosition): Int {
+    private fun List<CharArray>.hasLoopIfWall(i: Int, j: Int, start: GuardPosition): Int {
         var result = 0
         if (get(i)[j] == '.') {
             get(i)[j] = '#'
@@ -40,12 +40,13 @@ object Day6 {
         var guard = start
         val visited = mutableSetOf<GuardPosition>()
         while (isIndexInBound(guard.i, guard.j)) {
-            if (guard in visited) {
-                return true
-            } else {
+            if (guard in visited) return true
+            guard = if (getNextIfExists(guard) == '#') {
                 visited.add(guard)
+                guard.turnRight()
+            } else {
+                guard.step()
             }
-            guard = if (getNextIfExists(guard) == '#') guard.turnRight() else guard.step()
         }
         return false
     }
@@ -82,11 +83,11 @@ object Day6 {
 
     private fun GuardPosition.turnRight() = GuardPosition(i, j, direction.turnRight())
 
-    private enum class Direction(val char1: Char, val char2: Char, val dx: Int, val dy: Int) {
-        UP('^', '|', 0, -1),
-        RIGHT('>', '-', 1, 0),
-        DOWN('v', '|', 0, 1),
-        LEFT('<', '-', -1, 0);
+    private enum class Direction(val char1: Char, val dx: Int, val dy: Int) {
+        UP('^', 0, -1),
+        RIGHT('>', 1, 0),
+        DOWN('v', 0, 1),
+        LEFT('<', -1, 0);
 
         fun turnRight(): Direction {
             return when (this) {

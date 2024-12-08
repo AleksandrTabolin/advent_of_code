@@ -2,55 +2,46 @@ object Day8 {
 
     fun solvePart1(input: Sequence<String>): Int {
         val board = input.toList().map { it.toCharArray() }
-        board.collect().forEach { it.forAllVariant { l, r -> board.markAntiNodeIfExists1(l, r) } }
+        board.markAntinodes { l, r -> board.markAntinodesIfExists(l, r) }
         return board.sumOf { line -> line.count { it == '#' } }
     }
 
     fun solvePart2(input: Sequence<String>): Int {
         val board = input.toList().map { it.toCharArray() }
-        board.collect().forEach { it.forAllVariant { l, r -> board.markAntiNodeIfExists2(l, r) } }
+        board.markAntinodes { l, r -> board.markAntinodesIfExists(l, r, all = true) }
         return board.sumOf { line -> line.count { it != '.' } }
     }
 
-    private inline fun List<Pair<Int, Int>>.forAllVariant(block: (l: Pair<Int, Int>, r: Pair<Int, Int>) -> Unit) {
-        for (i in 0 until lastIndex) {
-            for (j in (i + 1)..lastIndex) {
-                block.invoke(get(i), get(j))
-            }
-        }
-    }
-
-    private fun List<CharArray>.markAntiNodeIfExists1(l: Pair<Int, Int>, r: Pair<Int, Int>) {
+    private fun List<CharArray>.markAntinodesIfExists(l: Pair<Int, Int>, r: Pair<Int, Int>, all: Boolean = false) {
         val dx = l.second - r.second
         val dy = l.first - r.first
-        l.applyDiff(dx, dy).let { if (isInBound(it)) mark(it) }
-        r.applyDiff(-dx, -dy).let { if (isInBound(it)) mark(it) }
+        mark(l, dx, dy, all)
+        mark(r, -dx, -dy, all)
     }
 
-    private fun List<CharArray>.markAntiNodeIfExists2(l: Pair<Int, Int>, r: Pair<Int, Int>) {
-        val dx = l.second - r.second
-        val dy = l.first - r.first
-
-        var node = l.applyDiff(dx, dy)
+    private fun List<CharArray>.mark(input: Pair<Int, Int>, dx: Int, dy: Int, all: Boolean) {
+        var node = input.applyDiff(dx, dy)
         while (isInBound(node)) {
             mark(node)
+            if (!all) break
             node = node.applyDiff(dx, dy)
         }
-        node = r.applyDiff(-dx, -dy)
-        while (isInBound(node)) {
-            mark(node)
-            node = node.applyDiff(-dx, -dy)
+    }
+
+    private fun List<CharArray>.markAntinodes(marker: (l: Pair<Int, Int>, r: Pair<Int, Int>) -> Unit) {
+        collect().forEach { antennas ->
+            for (i in 0 until antennas.lastIndex)
+                for (j in (i + 1)..antennas.lastIndex)
+                    marker.invoke(antennas[i], antennas[j])
         }
     }
 
     private fun List<CharArray>.collect(): List<List<Pair<Int, Int>>> {
         val antennas = mutableMapOf<Char, MutableList<Pair<Int, Int>>>()
-        for (i in indices) {
-            for (j in get(i).indices) {
-                val ch = get(i)[j]
-                if (ch == '.') continue
-                antennas.getOrPut(ch) { mutableListOf() }.add(i to j)
-            }
+        for (i in indices) for (j in get(i).indices) {
+            val ch = get(i)[j]
+            if (ch == '.') continue
+            antennas.getOrPut(ch) { mutableListOf() }.add(i to j)
         }
         return antennas.values.toList()
     }

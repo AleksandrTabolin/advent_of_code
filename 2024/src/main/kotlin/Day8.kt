@@ -29,21 +29,13 @@ object Day8 {
     }
 
     private fun List<CharArray>.markAntinodes(marker: (l: Pair<Int, Int>, r: Pair<Int, Int>) -> Unit) {
-        collect().forEach { antennas ->
+        foldIndexed(mutableMapOf<Char, MutableList<Pair<Int, Int>>>()) { i, acc, line ->
+            acc.apply { line.forEachIndexed { j, ch -> if (ch != '.') getOrPut(ch) { mutableListOf() }.add(i to j) } }
+        }.values.forEach { antennas ->
             for (i in 0 until antennas.lastIndex)
                 for (j in (i + 1)..antennas.lastIndex)
                     marker.invoke(antennas[i], antennas[j])
         }
-    }
-
-    private fun List<CharArray>.collect(): List<List<Pair<Int, Int>>> {
-        val antennas = mutableMapOf<Char, MutableList<Pair<Int, Int>>>()
-        for (i in indices) for (j in get(i).indices) {
-            val ch = get(i)[j]
-            if (ch == '.') continue
-            antennas.getOrPut(ch) { mutableListOf() }.add(i to j)
-        }
-        return antennas.values.toList()
     }
 
     private fun List<CharArray>.mark(p: Pair<Int, Int>) {

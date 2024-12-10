@@ -6,14 +6,7 @@ object Day10 {
         return input.parseInput().run {
             findTrailheads().sumOf {
                 val visited = mutableSetOf<Pair<Int, Int>>()
-                count(0, it) { point ->
-                    if (point in visited) {
-                        true
-                    } else {
-                        visited.add(point)
-                        false
-                    }
-                }
+                count(0, it) { point -> !visited.add(point)}
             }
         }
     }

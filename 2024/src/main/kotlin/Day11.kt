@@ -1,3 +1,6 @@
+import utils.length
+import utils.splitInHalf
+
 object Day11 {
 
     fun solvePart1(input: Sequence<String>): Long {
@@ -28,24 +31,7 @@ object Day11 {
 
     private fun Long.nextValue(): Pair<Long, Long?> = when {
         this == 0L -> 1L to null
-        length() % 2 == 0 -> split()
+        length() % 2 == 0 -> splitInHalf()
         else -> this * 2024 to null
     }
-
-    private fun Long.split(): Pair<Long, Long> {
-        val m = 10L.pow(length() / 2)
-        return this / m to this % m
-    }
-
-    private fun Long.length(): Int {
-        var value = this
-        var size = 0
-        while (value > 0) {
-            value /= 10
-            size += 1
-        }
-        return size
-    }
-
-    private fun Long.pow(x: Int): Long = (2..x).fold(this) { r, _ -> r * this }
 }

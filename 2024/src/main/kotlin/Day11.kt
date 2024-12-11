@@ -3,13 +3,9 @@ import utils.splitInHalf
 
 object Day11 {
 
-    fun solvePart1(input: Sequence<String>): Long {
-        return input.first().solve(25)
-    }
+    fun solvePart1(input: Sequence<String>): Long = input.first().solve(25)
 
-    fun solvePart2(input: Sequence<String>): Long {
-        return input.first().solve(75)
-    }
+    fun solvePart2(input: Sequence<String>): Long = input.first().solve(75)
 
     private fun String.solve(iterationLimit: Int): Long {
         val cache: MutableMap<Pair<Long, Int>, Long> = mutableMapOf()

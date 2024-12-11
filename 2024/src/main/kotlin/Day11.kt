@@ -21,11 +21,8 @@ object Day11 {
         val key = value to iter
         if (key in cache) return cache.getValue(key)
         return value.nextValue().let { (l, r) ->
-            if (r != null) {
-                count(cache, l, iter + 1, iterLimit) + count(cache, r, iter + 1, iterLimit)
-            } else {
-                count(cache, l, iter + 1, iterLimit)
-            }
+            if (r != null) count(cache, l, iter + 1, iterLimit) + count(cache, r, iter + 1, iterLimit)
+            else count(cache, l, iter + 1, iterLimit)
         }.also { cache[key] = it }
     }
 

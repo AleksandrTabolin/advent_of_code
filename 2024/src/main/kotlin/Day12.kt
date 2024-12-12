@@ -1,17 +1,18 @@
 import utils.Direction
 import utils.Step
 import utils.nextStep
+import utils.turnRight
 
 object Day12 {
 
     fun solvePart1(input: Sequence<String>): Int {
-        val board = input.toList().map { it.toCharArray() }
+        val board = input.toList()
         var result = 0
         val visited = mutableSetOf<Pair<Int, Int>>()
         for (i in board.indices) {
             for (j in board[i].indices) {
                 if (i to j !in visited) {
-                    val (area, perimeter) = board.count(i, j, visited)
+                    val (area, perimeter) = board.countAreaAndPerimeter(i, j, visited)
                     result += area * perimeter
                 }
             }
@@ -20,25 +21,22 @@ object Day12 {
     }
 
     fun solvePart2(input: Sequence<String>): Int {
-        val board = input.toList().map { it.toCharArray() }
+        val board = input.toList()
         var result = 0
         val visited = mutableSetOf<Pair<Int, Int>>()
         for (i in board.indices) {
             for (j in board[i].indices) {
                 if (i to j !in visited) {
-                    val items = mutableListOf<Pair<Int, Int>>()
-                    board.collect(i, j, visited, items)
-                    val sides = board.countSides(items)
-                    val area = items.size
-                    result += sides * area
+                    val items = mutableListOf<Pair<Int, Int>>().apply { board.collect(i, j, visited, this) }
+                    result += board.countSides(items) * items.size
                 }
             }
         }
         return result
     }
 
-    private fun List<CharArray>.countSides(items: List<Pair<Int, Int>>): Int {
-        val innerVisited = mutableSetOf<Step>()
+    private fun List<CharSequence>.countSides(items: List<Pair<Int, Int>>): Int {
+        val visited = mutableSetOf<Step>()
         var result = 0
         for (item in items) {
             val up = item.first - 1 to item.second
@@ -46,15 +44,14 @@ object Day12 {
                 continue
             }
             val step = Step(item.first, item.second, Direction.LEFT)
-
-            if (step !in innerVisited) {
-                result += countSides(step, innerVisited)
+            if (step !in visited) {
+                result += countSides(step, visited)
             }
         }
         return result
     }
 
-    private fun List<CharArray>.collect(
+    private fun List<CharSequence>.collect(
         i: Int,
         j: Int,
         visited: MutableSet<Pair<Int, Int>>,
@@ -72,40 +69,35 @@ object Day12 {
         }
     }
 
-    private fun List<CharArray>.countSides(step: Step, visited: MutableSet<Step>): Int {
+    private fun List<CharSequence>.countSides(step: Step, visited: MutableSet<Step>): Int {
         if (step in visited) return 0
         visited.add(step)
 
         var sides = 0
-        val nextStep: Step
-
-        if (isRightSame(step)) {
+        val nextStep = if (isNextStepSame(step.turnRight())) {
             sides += 1
-            nextStep = step.copy(direction = step.direction.turnRight()).nextStep()
-        } else if (isNextStepSame(step)) {
-            nextStep = step.nextStep()
+            step.turnRight().nextStep()
+        } else if (!isNextStepSame(step)) {
+            sides += 1
+            step.copy(direction = step.direction.turnLeft())
         } else {
-            sides += 1
-            nextStep = step.copy(direction = step.direction.turnLeft())
+            step.nextStep()
         }
         sides += countSides(nextStep, visited)
         return sides
     }
 
-    private fun List<CharArray>.isNextStepSame(step: Step): Boolean = isNextStepSame(step.i, step.j, step.direction)
-
-    private fun List<CharArray>.isRightSame(step: Step): Boolean {
-        val up = step.direction.turnRight()
-        return isNextStepSame(step.i, step.j, up)
+    private fun List<CharSequence>.isNextStepSame(step: Step): Boolean {
+        val nextI = step.i + step.direction.di
+        val nextJ = step.j + step.direction.dj
+        return isInBound(nextI to nextJ) && get(nextI)[nextJ] == get(step.i)[step.j]
     }
 
-    private fun List<CharArray>.isNextStepSame(i: Int, j: Int, direction: Direction): Boolean {
-        val nextI = i + direction.di
-        val nextJ = j + direction.dj
-        return isInBound(nextI to nextJ) && get(nextI)[nextJ] == get(i)[j]
-    }
-
-    private fun List<CharArray>.count(i: Int, j: Int, visited: MutableSet<Pair<Int, Int>>): Pair<Int, Int> {
+    private fun List<CharSequence>.countAreaAndPerimeter(
+        i: Int,
+        j: Int,
+        visited: MutableSet<Pair<Int, Int>>
+    ): Pair<Int, Int> {
         var area = 1
         var perimeter = 0
         val char = get(i)[j]
@@ -116,7 +108,7 @@ object Day12 {
             if (!isInBound(nextI to nextJ) || get(nextI)[nextJ] != char) {
                 perimeter += 1
             } else if (nextI to nextJ !in visited) {
-                val (a, p) = count(nextI, nextJ, visited)
+                val (a, p) = countAreaAndPerimeter(nextI, nextJ, visited)
                 area += a
                 perimeter += p
             }
@@ -124,6 +116,5 @@ object Day12 {
         return area to perimeter
     }
 
-    private fun List<CharArray>.isInBound(p: Pair<Int, Int>) = p.first in indices && p.second in get(p.first).indices
-
+    private fun List<CharSequence>.isInBound(p: Pair<Int, Int>) = p.first in indices && p.second in get(p.first).indices
 }

@@ -31,4 +31,8 @@ data class Step(
     val direction: Direction,
 )
 
+fun Step.turnRight(): Step = copy(direction = direction.turnRight())
+
+fun Step.turnLeft(): Step = copy(direction = direction.turnLeft())
+
 fun Step.nextStep(): Step = Step(i + direction.di, j + direction.dj, direction)

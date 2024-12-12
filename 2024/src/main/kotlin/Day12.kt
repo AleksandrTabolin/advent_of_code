@@ -1,7 +1,4 @@
-import utils.Direction
-import utils.Step
-import utils.nextStep
-import utils.turnRight
+import utils.*
 
 object Day12 {
 
@@ -79,7 +76,7 @@ object Day12 {
             step.turnRight().nextStep()
         } else if (!isNextStepSame(step)) {
             sides += 1
-            step.copy(direction = step.direction.turnLeft())
+            step.turnLeft()
         } else {
             step.nextStep()
         }

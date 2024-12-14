@@ -5,7 +5,7 @@ object Day14 {
     fun solvePart1(input: Sequence<String>, sizeX: Int, sizeY: Int): Int {
         val robots = input.map { it.parse() }.toList()
         repeat(times = 100) { robots.forEach { it.nextStep(sizeX, sizeY) } }
-        return robots.countQuadrants(sizeX, sizeY).let { it.rb * it.rt * it.lb * it.lt }
+        return robots.countResult(sizeX, sizeY)
     }
 
     fun solvePart2(input: Sequence<String>, sizeX: Int, sizeY: Int): Int {
@@ -51,26 +51,33 @@ object Day14 {
         for (i in indices) set(i, 0)
     }
 
-    private fun List<Robot>.countQuadrants(sizeX: Int, sizeY: Int): Quadrants {
-        val qY = sizeY / 2
-        val qX = sizeX / 2
+    private fun List<Robot>.countResult(sizeX: Int, sizeY: Int): Int {
+        val qY = sizeY / 2; val qX = sizeX / 2
+        var lt = 0; var lb = 0; var rt = 0; var rb = 0
 
-        return fold(Quadrants()) { q, r ->
+        forEach { r ->
             val (x, y) = r.p
-            q.apply {
-                when {
-                    x > qX -> when {
-                        y > qY -> rb += 1
-                        y < qY -> rt += 1
-                    }
-
-                    x < qX -> when {
-                        y > qY -> lb += 1
-                        y < qY -> lt += 1
-                    }
+            when {
+                x > qX -> when {
+                    y > qY -> rb += 1
+                    y < qY -> rt += 1
+                }
+                x < qX -> when {
+                    y > qY -> lb += 1
+                    y < qY -> lt += 1
                 }
             }
         }
+
+        return  rb * rt * lb * lt
+    }
+
+    private fun Robot.nextStep(sizeX: Int, sizeY: Int) {
+        var nextX = (p.first + v.first) % sizeX
+        var nextY = (p.second + v.second) % sizeY
+        if (nextX < 0) nextX += sizeX
+        if (nextY < 0) nextY += sizeY
+        p = nextX to nextY
     }
 
     private fun String.parse(): Robot {
@@ -82,21 +89,6 @@ object Day14 {
                     v = it.last().first().toInt() to it.last().last().toInt(),
                 )
             }
-    }
-
-    private data class Quadrants(
-        var lt: Int = 0,
-        var lb: Int = 0,
-        var rt: Int = 0,
-        var rb: Int = 0,
-    )
-
-    private fun Robot.nextStep(sizeX: Int, sizeY: Int) {
-        var nextX = (p.first + v.first) % sizeX
-        var nextY = (p.second + v.second) % sizeY
-        if (nextX < 0) nextX += sizeX
-        if (nextY < 0) nextY += sizeY
-        p = nextX to nextY
     }
 
     private data class Robot(var p: Pair<Int, Int>, val v: Pair<Int, Int>)

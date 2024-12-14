@@ -1,3 +1,5 @@
+import kotlin.math.min
+
 object Day14 {
 
     fun solvePart1(input: Sequence<String>, sizeX: Int, sizeY: Int): Int {
@@ -20,22 +22,21 @@ object Day14 {
     }
 
     private fun List<Robot>.check(sizeX: Int, sizeY: Int): Boolean {
-        val windows = 6
-        val (wX, wY) = countWindows(sizeX, sizeY, windows = windows)
-        return wX.sum() / wX.max() < windows / 2 && wY.sum() / wY.max() < windows / 2
-    }
+        val windows = 8
 
-    private fun List<Robot>.countWindows(sizeX: Int, sizeY: Int, windows: Int): Pair<IntArray, IntArray> {
         val windowSize = sizeX / windows
-        val resultX = IntArray(sizeX / windowSize + 1) { 0 }
-        val resultY = IntArray(sizeY / windowSize + 1) { 0 }
+        val resultX = IntArray(sizeX - windowSize + 1) { 0 }
+        val resultY = IntArray(sizeY - windowSize + 1) { 0 }
         forEach { r ->
-            resultX[r.p.first / windowSize] += 1
-            resultY[r.p.second / windowSize] += 1
+            for (i in r.p.first..min(r.p.first + windowSize, sizeX - windowSize - 1)) {
+                resultX[i] += 1
+            }
+            for (i in r.p.second..min(r.p.second + windowSize, sizeY - windowSize - 1)) {
+                resultY[i] += 1
+            }
         }
-        return resultX to resultY
+        return size / resultX.max() <= 2 && size / resultY.max() <= 2
     }
-
 
     private fun List<Robot>.countQuadrants(sizeX: Int, sizeY: Int): Quadrants {
         val qY = sizeY / 2

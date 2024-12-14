@@ -10,32 +10,45 @@ object Day14 {
 
     fun solvePart2(input: Sequence<String>, sizeX: Int, sizeY: Int): Int {
         val robots = input.map { it.parse() }.toList()
-        val attempts = 10000
+
+        val windowSize = sizeX / 8
+        val windowsX = IntArray(sizeX - windowSize + 1)
+        val windowsY = IntArray(sizeY - windowSize + 1)
+
         var i = 1
+        val attempts = 10000
+
         while (i < attempts) {
             robots.forEach { it.nextStep(sizeX, sizeY) }
-            if (robots.check(sizeX, sizeY)) break
+            windowsX.clear()
+            windowsY.clear()
+            if (robots.check(sizeX, sizeY, windowsX, windowsY, windowSize)) break
             i += 1
         }
         if (i == attempts) throw IllegalStateException("Nothing found")
         return i
     }
 
-    private fun List<Robot>.check(sizeX: Int, sizeY: Int): Boolean {
-        val windows = 8
-
-        val windowSize = sizeX / windows
-        val resultX = IntArray(sizeX - windowSize + 1) { 0 }
-        val resultY = IntArray(sizeY - windowSize + 1) { 0 }
+    private fun List<Robot>.check(
+        sizeX: Int,
+        sizeY: Int,
+        windowsX: IntArray,
+        windowsY: IntArray,
+        windowSize: Int
+    ): Boolean {
         forEach { r ->
             for (i in r.p.first..min(r.p.first + windowSize, sizeX - windowSize - 1)) {
-                resultX[i] += 1
+                windowsX[i] += 1
             }
             for (i in r.p.second..min(r.p.second + windowSize, sizeY - windowSize - 1)) {
-                resultY[i] += 1
+                windowsY[i] += 1
             }
         }
-        return size / resultX.max() <= 2 && size / resultY.max() <= 2
+        return size / windowsX.max() <= 2 && size / windowsY.max() <= 2
+    }
+
+    private fun IntArray.clear() {
+        for (i in indices) set(i, 0)
     }
 
     private fun List<Robot>.countQuadrants(sizeX: Int, sizeY: Int): Quadrants {

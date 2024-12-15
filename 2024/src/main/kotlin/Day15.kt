@@ -16,23 +16,29 @@ object Day15 {
     }
 
     private fun List<CharArray>.moveP1(pos: Pair<Int, Int>, dir: Direction): Pair<Int, Int> {
-        var spacePos = freeSpacePos(pos, dir) ?: return pos
-        while (pos != spacePos) {
-            val prev = (spacePos.first - dir.di) to (spacePos.second - dir.dj)
-            swap(prev, spacePos)
-            spacePos = prev
-        }
-        return pos.first + dir.di to pos.second + dir.dj
+        return if (simpleMove(pos, dir)) pos.first + dir.di to pos.second + dir.dj else pos
     }
 
     private fun List<CharArray>.moveP2(pos: Pair<Int, Int>, dir: Direction): Pair<Int, Int> = when {
-        dir.isHorizontal -> moveP1(pos, dir)
+        dir.isHorizontal -> if (simpleMove(pos, dir)) pos.first + dir.di to pos.second + dir.dj else pos
         isVerticalMovePossible(pos, dir) -> {
             moveVertical(pos, dir)
             pos.first + dir.di to pos.second + dir.dj
         }
 
         else -> pos
+    }
+
+    private fun List<CharArray>.simpleMove(pos: Pair<Int, Int>, dir: Direction): Boolean {
+        val nextI = pos.first + dir.di
+        val nextJ = pos.second + dir.dj
+        return when (get(pos.first)[pos.second]) {
+            '.' -> true
+            '#' -> false
+            else -> simpleMove(nextI to nextJ, dir).also {
+                if (it) swap(pos, nextI to nextJ)
+            }
+        }
     }
 
     private fun List<CharArray>.isVerticalMovePossible(pos: Pair<Int, Int>, dir: Direction): Boolean {
@@ -71,17 +77,6 @@ object Day15 {
                 swap(pos.first to pos.second - 1, nextI to nextJ - 1)
             }
         }
-    }
-
-    private fun List<CharArray>.freeSpacePos(pos: Pair<Int, Int>, dir: Direction): Pair<Int, Int>? {
-        var nextI = pos.first + dir.di
-        var nextJ = pos.second + dir.dj
-        while (get(nextI)[nextJ] != '#') {
-            if (get(nextI)[nextJ] == '.') return nextI to nextJ
-            nextI += dir.di
-            nextJ += dir.dj
-        }
-        return null
     }
 
     private fun List<CharArray>.swap(p1: Pair<Int, Int>, p2: Pair<Int, Int>) {

@@ -6,13 +6,13 @@ object Day15 {
 
     fun solvePart1(input: Sequence<String>): Int {
         val (field, moves) = input.parseInput()
-        moves.scan(field.indexOfSubMarine()) { pos, m -> field.moveP1(pos, m) }
+        moves.fold(field.indexOfSubMarine()) { pos, m -> field.moveP1(pos, m) }
         return field.count('O')
     }
 
     fun solvePart2(input: Sequence<String>): Int {
         val (field, moves) = input.parseInput(p2 = true)
-        moves.scan(field.indexOfSubMarine()) { pos, m -> field.moveP2(pos, m) }
+        moves.fold(field.indexOfSubMarine()) { pos, m -> field.moveP2(pos, m) }
         return field.count('[')
     }
 

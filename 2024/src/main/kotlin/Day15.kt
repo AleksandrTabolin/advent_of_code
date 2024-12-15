@@ -73,7 +73,6 @@ object Day15 {
         }
     }
 
-
     private fun List<CharArray>.freeSpacePos(pos: Pair<Int, Int>, dir: Direction): Pair<Int, Int>? {
         var nextI = pos.first + dir.di
         var nextJ = pos.second + dir.dj
@@ -98,16 +97,6 @@ object Day15 {
             }
         }
         throw IllegalStateException("There is no submarine")
-    }
-
-    private fun List<CharArray>.countP1(): Int {
-        var result = 0
-        for (i in indices) {
-            for (j in indices) {
-                if (get(i)[j] == 'O') result += 100 * i + j
-            }
-        }
-        return result
     }
 
     private fun List<CharArray>.count(ch: Char): Int {

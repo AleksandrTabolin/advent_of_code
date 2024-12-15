@@ -1,4 +1,5 @@
 import utils.Direction
+import utils.indexesOf
 import utils.parseDirections
 
 object Day15 {
@@ -85,40 +86,20 @@ object Day15 {
         get(p2.first)[p2.second] = temp
     }
 
-    private fun List<CharArray>.indexOfSubMarine(): Pair<Int, Int> {
-        for (i in indices) {
-            for (j in get(i).indices) {
-                if (get(i)[j] == '@') return i to j
-            }
-        }
-        throw IllegalStateException("There is no submarine")
-    }
+    private fun List<CharArray>.indexOfSubMarine() = indexesOf('@').first()
 
-    private fun List<CharArray>.count(ch: Char): Int {
-        var result = 0
-        for (i in indices) {
-            for (j in get(i).indices) {
-                val row = get(i)
-                if (row[j] == ch) {
-                    result += 100 * i + j
-                }
-            }
-        }
-        return result
-    }
+    private fun List<CharArray>.count(ch: Char): Int = indexesOf(ch).sumOf{ (i, j) -> 100 * i + j }
 
     private fun Sequence<String>.parseInput(p2: Boolean = false): Pair<List<CharArray>, List<Direction>> {
-        val field = mutableListOf<CharArray>()
-        val moves = mutableListOf<Direction>()
         var takeFiled = true
-        forEach {
+        return fold(mutableListOf<CharArray>() to mutableListOf<Direction>()) { acc, line ->
             when {
-                it.isBlank() -> takeFiled = false
-                takeFiled -> field.add(it.update(p2).toCharArray())
-                else -> moves.addAll(it.parseDirections())
+                line.isBlank() -> takeFiled = false
+                takeFiled -> acc.first.add(line.update(p2).toCharArray())
+                else -> acc.second.addAll(line.parseDirections())
             }
+            acc
         }
-        return field to moves
     }
 
     private fun String.update(p2: Boolean = false): String {

@@ -10,7 +10,7 @@ object Day18 {
         return bfs(size, corrupted.take(fallSize).toSet())
     }
 
-    fun solvePart2(input: Sequence<String>, fallSize: Int, size: Int): Pair<Int, Int> {
+    fun solvePart2(input: Sequence<String>, size: Int): Pair<Int, Int> {
         val corrupted = input.parseInput()
         val p = corrupted.binarySearch { p ->
             val i = corrupted.indexOf(p)

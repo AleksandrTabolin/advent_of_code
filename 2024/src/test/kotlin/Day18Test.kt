@@ -46,12 +46,12 @@ class Day18Test {
     @Test
     fun test1p2() {
         val input = input.splitToSequence("\n")
-        Assertions.assertEquals(6 to 1, Day18.solvePart2(input, 12,7))
+        Assertions.assertEquals(6 to 1, Day18.solvePart2(input, 12))
     }
 
     @Test
     fun test2p2() {
         val input = FileHelper.readByLines("day18")
-        Assertions.assertEquals(45 to 16, Day18.solvePart2(input, 1024, 71))
+        Assertions.assertEquals(45 to 16, Day18.solvePart2(input, 1024))
     }
 }

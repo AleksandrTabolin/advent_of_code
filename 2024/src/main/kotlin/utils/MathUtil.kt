@@ -31,7 +31,7 @@ fun Long.length(): Int {
     return size
 }
 
-fun Long.pow(x: Int): Long = (2..x).fold(this) { r, _ -> r * this }
+fun Long.pow(x: Long): Long = if (x == 0L) 1 else (2..x).fold(this) { r, _ -> r * this }
 
 fun Int.length(): Int {
     var value = this
@@ -46,7 +46,7 @@ fun Int.length(): Int {
 fun Int.pow(x: Int): Int = (2..x).fold(this) { r, _ -> r * this }
 
 fun Long.splitInHalf(): Pair<Long, Long> {
-    val m = 10L.pow(length() / 2)
+    val m = 10L.pow((length() / 2).toLong())
     return this / m to this % m
 }
 

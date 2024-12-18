@@ -9,3 +9,8 @@ fun List<CharArray>.indexesOf(ch: Char): Sequence<Pair<Int, Int>> = sequence {
         }
     }
 }
+
+
+fun String.takeDigits() = filter { it.isDigit() }.toInt()
+fun String.takeIntList(separator: Char = ',') =
+    filter { it.isDigit() || it == separator }.split(separator).map { it.toInt() }

@@ -7,27 +7,30 @@ enum class Direction(
     val isHorizontal: Boolean = false,
     val sign: Char
 ) {
-    UP(-1, 0, isVertical = true, sign = '^'),
-    DOWN(1, 0, isVertical = true, sign = 'v'),
-    LEFT(0, -1, isHorizontal = true, sign = '<'),
-    RIGHT(0, 1, isHorizontal = true, sign = '>');
+    UP(di = -1, dj = 0, isVertical = true, sign = '^'),
+    DOWN(di = 1, dj = 0, isVertical = true, sign = 'v'),
+    LEFT(di = 0, dj = -1, isHorizontal = true, sign = '<'),
+    RIGHT(di = 0, dj = 1, isHorizontal = true, sign = '>');
 
-    fun turnLeft(): Direction {
-        return when (this) {
-            UP -> LEFT
-            DOWN -> RIGHT
-            RIGHT -> UP
-            LEFT -> DOWN
-        }
+    fun turnLeft() = when (this) {
+        UP -> LEFT
+        DOWN -> RIGHT
+        RIGHT -> UP
+        LEFT -> DOWN
     }
 
-    fun turnRight(): Direction {
-        return when (this) {
-            UP -> RIGHT
-            DOWN -> LEFT
-            RIGHT -> DOWN
-            LEFT -> UP
-        }
+    fun turnRight() = when (this) {
+        UP -> RIGHT
+        DOWN -> LEFT
+        RIGHT -> DOWN
+        LEFT -> UP
+    }
+
+    fun turnBack() = when (this) {
+        UP -> DOWN
+        DOWN -> UP
+        RIGHT -> LEFT
+        LEFT -> RIGHT
     }
 
     fun isOrthogonal(d: Direction) = isVertical != d.isVertical
@@ -78,8 +81,8 @@ fun Pair<Int, Int>.reverse() = second to first
 fun Pair<Int, Int>.inBound(size: Int) = first in 0 until size && second in 0 until size
 
 fun List<CharArray>.print() {
-    forEach {
-        it.forEach { print(it) }
+    forEach { row ->
+        row.forEach { print(it) }
         println()
     }
 }

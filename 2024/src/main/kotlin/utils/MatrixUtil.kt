@@ -73,6 +73,10 @@ fun List<CharArray>.setValue(p: Pair<Int, Int>, char: Char) {
 
 fun Pair<Int, Int>.nextPoint(d: Direction) = first + d.di to second + d.dj
 
+fun Pair<Int, Int>.reverse() = second to first
+
+fun Pair<Int, Int>.inBound(size: Int) = first in 0 until size && second in 0 until size
+
 fun List<CharArray>.print() {
     forEach {
         it.forEach { print(it) }

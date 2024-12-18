@@ -6,16 +6,19 @@ import utils.reverse
 object Day18 {
 
     fun solvePart1(input: Sequence<String>, fallSize: Int, size: Int): Int {
-        val corrupted = input.parseInput().take(fallSize).toSet()
-        return bfs(size, corrupted)
+        val corrupted = input.parseInput()
+        return bfs(size, corrupted.take(fallSize).toSet())
     }
 
     fun solvePart2(input: Sequence<String>, fallSize: Int, size: Int): Pair<Int, Int> {
         val corrupted = input.parseInput()
-        for (i in fallSize..corrupted.lastIndex) {
-            if (bfs(size, corrupted.take(i).toSet()) == -1) return corrupted[i - 1].reverse()
+        val p = corrupted.binarySearch { p ->
+            val i = corrupted.indexOf(p)
+            val f1 = i - 1 > 0 && bfs(size, corrupted.take(i - 1).toSet()) == -1
+            val f2 = bfs(size, corrupted.take(i).toSet()) == -1
+            if (!f1 && f2) 0 else if (f1 && f2) 1 else -1
         }
-        return -1 to -1
+        return corrupted.getOrNull(p - 1)?.reverse() ?: (-1 to -1)
     }
 
     private fun bfs(
@@ -26,7 +29,6 @@ object Day18 {
         val start = 0 to 0
         queue.add(start to 0)
         val visited = mutableSetOf<Pair<Int, Int>>()
-        visited.add(start)
 
         while (queue.isNotEmpty()) {
             val (pos, steps) = queue.removeFirst()

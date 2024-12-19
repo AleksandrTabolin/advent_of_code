@@ -1,3 +1,5 @@
+import utils.withCache
+
 object Day19 {
 
     fun solvePart1(input: Sequence<String>): Int {
@@ -13,10 +15,11 @@ object Day19 {
     }
 
     private fun countVariants(cache: MutableMap<String, Long>, variant: String, patterns: List<String>): Long {
-        if (variant in cache) return cache.getValue(variant)
-        return patterns.asSequence().filter(variant::startsWith).sumOf { pattern ->
-            if (pattern == variant) 1 else countVariants(cache, variant.substring(pattern.length), patterns)
-        }.also { cache[variant] = it }
+        return cache.withCache(variant) { v ->
+            patterns.asSequence().filter(variant::startsWith).sumOf { pattern ->
+                if (pattern == v) 1 else countVariants(cache, v.substring(pattern.length), patterns)
+            }
+        }
     }
 
     private fun Sequence<String>.parseInput(): Pair<List<String>, List<String>> {

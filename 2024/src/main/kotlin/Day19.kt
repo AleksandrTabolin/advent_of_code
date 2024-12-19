@@ -14,14 +14,9 @@ object Day19 {
 
     private fun countVariants(cache: MutableMap<String, Long>, variant: String, patterns: List<String>): Long {
         if (variant in cache) return cache.getValue(variant)
-        var result = 0L
-        for (p in patterns) {
-            if (variant.startsWith(p)) {
-                result += if (p == variant) 1 else countVariants(cache, variant.substring(p.length), patterns)
-            }
-        }
-        cache[variant] = result
-        return result
+        return patterns.asSequence().filter(variant::startsWith).sumOf { pattern ->
+            if (pattern == variant) 1 else countVariants(cache, variant.substring(pattern.length), patterns)
+        }.also { cache[variant] = it }
     }
 
     private fun Sequence<String>.parseInput(): Pair<List<String>, List<String>> {

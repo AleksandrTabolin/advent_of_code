@@ -9,7 +9,7 @@ object Day19 {
     fun solvePart2(input: Sequence<String>): Long {
         val (patterns, variants) = input.parseInput()
         val cache = mutableMapOf<String, Long>()
-        return variants.sumOf { v -> countVariants(cache, v, patterns) }
+        return variants.sumOf { countVariants(cache, it, patterns) }
     }
 
     private fun countVariants(cache: MutableMap<String, Long>, variant: String, patterns: List<String>): Long {

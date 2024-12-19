@@ -16,13 +16,10 @@ object Day19 {
 
     private fun countVariants(cache: MutableMap<String, Long>, variant: String, patterns: List<String>): Long {
         return cache.withCache(variant) { v ->
-            patterns.asSequence().filter(variant::startsWith).sumOf { pattern ->
-                if (pattern == v) 1 else countVariants(cache, v.substring(pattern.length), patterns)
-            }
+            patterns.asSequence().filter(variant::startsWith)
+                .sumOf { if (it == v) 1 else countVariants(cache, v.substring(it.length), patterns) }
         }
     }
 
-    private fun Sequence<String>.parseInput(): Pair<List<String>, List<String>> {
-        return this.toList().let { it.first().split(", ") to it.drop(2) }
-    }
+    private fun Sequence<String>.parseInput() = toList().let { it.first().split(", ") to it.drop(2) }
 }

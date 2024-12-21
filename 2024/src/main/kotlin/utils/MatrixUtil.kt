@@ -86,3 +86,7 @@ fun List<CharArray>.print() {
         println()
     }
 }
+
+fun pointsInFourDirections(pos: Pos) : Sequence<Pos> = Direction.entries.asSequence().map(pos::nextPoint)
+
+typealias Pos = Pair<Int, Int>

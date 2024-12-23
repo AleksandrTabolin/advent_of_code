@@ -8,7 +8,7 @@ object Day21 {
         return input.sumOf { code ->
             sequence { find(code, dict = Day21Dict.DIALS) }
                 .map { findShortestKeyPath(it, n, cache) }
-                .min() * code.takeDigits().toLong()
+                .min() * code.takeDigits()
         }
     }
 
@@ -19,9 +19,9 @@ object Day21 {
     }
 
     private fun findShortestKeyPath(from: Char, to: Char, level: Int, maxLevel: Int, cache: MutableMap<CacheKey, Long>): Long {
-        if (level == maxLevel) return getArrow(from, to).minOf { it.length.toLong() }
+        if (level == maxLevel) return getArrowPath(from, to).minOf { it.length.toLong() }
         return cache.withCache(CacheKey(from, to, level)) {
-            getArrow(it.from, to).minOf { subPath ->
+            getArrowPath(from, to).minOf { subPath ->
                 subPath.indices.fold(0L) { acc, i ->
                     acc + findShortestKeyPath(if (i == 0) 'A' else subPath[i - 1], subPath[i], level + 1, maxLevel, cache)
                 }
@@ -29,7 +29,7 @@ object Day21 {
         }
     }
 
-    private fun getArrow(from: Char, to: Char) = Day21Dict.ARROWS.getValue(from).getValue(to)
+    private fun getArrowPath(from: Char, to: Char) = Day21Dict.ARROWS.getValue(from).getValue(to)
 
     private suspend fun SequenceScope<String>.find(
         code: String,

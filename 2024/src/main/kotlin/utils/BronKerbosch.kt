@@ -16,14 +16,11 @@ private fun <V> findCliques(
     val candidatesArray = candidates.toMutableList()
     if (!checkEnd(graph, candidates, alreadyFound)) {
         for (candidate in candidatesArray) {
-            val newCandidates = mutableListOf<V>()
-            val newAlreadyFound = mutableListOf<V>()
-
             potentialClique.add(candidate)
             candidates.remove(candidate)
 
-            candidates.asSequence().filter { it in graph.getValue(candidate) }.toCollection(newCandidates)
-            alreadyFound.asSequence().filter { it in graph.getValue(candidate) }.toCollection(newAlreadyFound)
+            val newCandidates = candidates.asSequence().filter { it in graph.getValue(candidate) }.toMutableList()
+            val newAlreadyFound = alreadyFound.asSequence().filter { it in graph.getValue(candidate) }.toMutableList()
 
             if (newCandidates.isEmpty() && newAlreadyFound.isEmpty()) {
                 result.add(potentialClique.toSet())
